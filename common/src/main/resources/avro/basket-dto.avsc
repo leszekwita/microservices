@@ -1,0 +1,37 @@
+{
+  "namespace": "com.radzik.michal.shop.common.kafka",
+  "type": "record",
+  "name": "BasketDto",
+  "version": "1",
+  "fields": [
+    {
+      "name": "productName",
+      "type": "string",
+      "avro.java.string": "String"
+    },
+    {
+      "name": "amount",
+      "type": "int"
+    },
+    {
+      "name": "date",
+      "type": "string",
+      "avro.java.string": "String"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "avro.java.string": "String"
+    },
+    {
+      "name": "price",
+      "type": "float"
+    },
+    {
+      "name": "productId",
+      "type": "long"
+    }
+
+
+  ]
+}

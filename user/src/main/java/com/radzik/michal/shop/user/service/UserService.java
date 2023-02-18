@@ -1,12 +1,9 @@
 package com.radzik.michal.shop.user.service;
 
 
-import com.radzik.michal.shop.user.exception.InvalidTokenException;
-import javassist.tools.web.BadHttpRequest;
+import com.radzik.michal.shop.user.domain.dao.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import com.radzik.michal.shop.user.domain.dao.User;
 
 public interface UserService {
 

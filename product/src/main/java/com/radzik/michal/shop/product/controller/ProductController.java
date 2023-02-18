@@ -2,10 +2,8 @@ package com.radzik.michal.shop.product.controller;
 
 
 import com.radzik.michal.shop.common.dto.ProductDto;
-
 import com.radzik.michal.shop.product.mapper.ProductMapper;
 import com.radzik.michal.shop.product.service.ProductService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

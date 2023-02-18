@@ -9,7 +9,7 @@ import com.radzik.michal.shop.user.exception.InvalidTokenException;
 import com.radzik.michal.shop.user.repository.RoleRepository;
 import com.radzik.michal.shop.user.repository.UserRepository;
 import com.radzik.michal.shop.user.service.UserService;
-import javassist.tools.web.BadHttpRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,13 +60,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(User user, Long id) {
         User userDb = findUserById(id);
         userDb.setFirstName(user.getFirstName());
         userDb.setLastName(user.getLastName());
         userDb.setEmail(user.getEmail());
 
-        return save(userDb);
+        return userDb;
     }
 
     @Override
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void validToken(String token) {
         Optional<User> user = userRepository.findByToken(token);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             throw new InvalidTokenException("Bad token");
         }
     }

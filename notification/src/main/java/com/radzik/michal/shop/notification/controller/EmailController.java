@@ -2,7 +2,6 @@ package com.radzik.michal.shop.notification.controller;
 
 import com.radzik.michal.shop.common.dto.MailDto;
 import com.radzik.michal.shop.notification.service.EmailService;
-import com.radzik.michal.shop.notification.service.impl.EmailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

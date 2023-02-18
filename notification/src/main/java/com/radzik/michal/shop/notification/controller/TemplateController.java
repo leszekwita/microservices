@@ -1,14 +1,13 @@
 package com.radzik.michal.shop.notification.controller;
 
-import com.radzik.michal.shop.notification.domain.dao.Template;
 import com.radzik.michal.shop.notification.domain.dto.TemplateDto;
 import com.radzik.michal.shop.notification.mapper.TemplateMapper;
 import com.radzik.michal.shop.notification.service.TemplateService;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.Mapper;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

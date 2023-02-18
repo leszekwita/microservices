@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.mail.internet.MimeMessage;
 import java.util.Locale;
 import java.util.Map;
 @Service

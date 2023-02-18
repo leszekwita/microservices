@@ -1,6 +1,7 @@
 package com.radzik.michal.shop.user.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,30 +29,42 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-       if(token == null || !token.startsWith("Bearer ")){
+
+       if (token == null || (!token.startsWith("Bearer ") && !token.startsWith("Basic "))) {
            chain.doFilter(request, response);
            return;
        }
-       Claims claims = Jwts.parser()
-               .setSigningKey("keySecret")
-               .parseClaimsJws(token.replace("Bearer ", ""))
-               .getBody();
-       String email = claims.getSubject();
 
-       if(email==null){
-           response.setStatus(401);
-           return;
-       }
-       String authorities = claims.get("authorities", String.class);
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        if(authorities != null && !authorities.isEmpty()){
-            grantedAuthorities = Arrays.stream(authorities.split(","))
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-
+        if (token.startsWith("Basic ")){
+            super.doFilterInternal(request, response, chain);
+            return;
         }
-        UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(email,null,grantedAuthorities);
-        SecurityContextHolder.getContext().setAuthentication(user);
-        chain.doFilter(request,response);
+       try {
+           Claims claims = Jwts.parser()
+                   .setSigningKey("keySecret")
+                   .parseClaimsJws(token.replace("Bearer ", ""))
+                   .getBody();
+           String email = claims.getSubject();
+           if(email==null){
+               response.setStatus(401);
+               return;
+           }
+           String authorities = claims.get("authorities", String.class);
+           List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+           if(authorities != null && !authorities.isEmpty()){
+               grantedAuthorities = Arrays.stream(authorities.split(","))
+                       .map(SimpleGrantedAuthority::new)
+                       .collect(Collectors.toList());
+
+           }
+           UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(email,null,grantedAuthorities);
+           SecurityContextHolder.getContext().setAuthentication(user);
+           chain.doFilter(request,response);
+       }catch (ExpiredJwtException e){
+           response.setStatus(401);
+       }
+
+
+
     }
 }

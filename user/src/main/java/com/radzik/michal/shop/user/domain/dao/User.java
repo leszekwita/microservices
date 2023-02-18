@@ -5,12 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -18,8 +16,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class User {
+@Audited
+public non-sealed class User extends Auditable {
 
     @Id
     @GeneratedValue
@@ -32,19 +30,18 @@ public class User {
     @Column(unique = true)
     private String email;
 
+    @NotAudited
     private String password;
 
+    @ManyToOne
+    private Address address;
+
     @ManyToMany
+    @NotAudited
     private Set<Role> roles;
 
-
-
-    @CreatedDate
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
-
     private String token;
+
+
 
 }

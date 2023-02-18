@@ -1,6 +1,5 @@
 package com.radzik.michal.shop.notification.service;
 
-import com.radzik.michal.shop.notification.domain.dao.NotificationHistory;
 import com.radzik.michal.shop.notification.domain.dao.Template;
 
 public interface TemplateService {

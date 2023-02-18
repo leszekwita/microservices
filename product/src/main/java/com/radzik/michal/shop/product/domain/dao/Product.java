@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -22,15 +23,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Product implements IdentifiedDataSerializable {
+@Audited
+public non-sealed class Product  extends Auditable implements IdentifiedDataSerializable {
 
         @Id
-        @GeneratedValue
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
         private String name;
 
-        private Integer price;
+        private Float price;
 
         private Integer amount;
 
@@ -57,7 +59,7 @@ public class Product implements IdentifiedDataSerializable {
     public void writeData(ObjectDataOutput objectDataOutput) throws IOException {
         objectDataOutput.writeLong(id);
         objectDataOutput.writeUTF(name);
-        objectDataOutput.writeInt(price);
+        objectDataOutput.writeFloat(price);
         objectDataOutput.writeInt(amount);
     }
 
@@ -65,7 +67,7 @@ public class Product implements IdentifiedDataSerializable {
     public void readData(ObjectDataInput objectDataInput) throws IOException {
         id = objectDataInput.readLong();
         name = objectDataInput.readUTF();
-        price = objectDataInput.readInt();
+        price = objectDataInput.readFloat();
         amount = objectDataInput.readInt();
 
     }

@@ -11,15 +11,20 @@ import com.radzik.michal.shop.basket.security.SecurityUtils;
 import com.radzik.michal.shop.basket.service.BasketService;
 import com.radzik.michal.shop.common.dto.ProductDto;
 import com.radzik.michal.shop.common.dto.UserDto;
+import com.radzik.michal.shop.common.kafka.BasketDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.UnknownHostException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +38,8 @@ public class BasketServiceImpl implements BasketService {
     private final UserClient userClient;
 
     private final BasketRepository basketRepository;
+
+    private final KafkaTemplate<String, BasketDto> kafkaTemplate;
 
    // @Retryable(value = {ConnectException.class, UnknownHostException.class}, maxAttempts = 5, backoff = @Backoff(delay = 500))
     @Override
@@ -49,9 +56,16 @@ public class BasketServiceImpl implements BasketService {
                 .email(currentUser.getEmail())
                 .product(product.toBuilder()
                         .name(productDb.getName())
-                        .price(productDb.getPrice())
+                        .price(productDb.getPrice().intValue())
                         .build())
                 .build());
+        kafkaTemplate.send("basketA", BasketDto.newBuilder()
+                        .setAmount(product.getAmount())
+                        .setEmail(currentUser.getEmail())
+                        .setProductName(productDb.getName())
+                        .setDate(LocalDateTime.now().toString())
+                .build()
+        );
     }
 
     @Override
@@ -87,7 +101,7 @@ public class BasketServiceImpl implements BasketService {
                 }
 
                 productDb.setAmount(product.getAmount());
-                productDb.setPrice(productDto.getPrice());
+                productDb.setPrice(productDto.getPrice().intValue());
                 productDb.setName(productDto.getName());
                 basketRepository.save(basket);
 
@@ -97,7 +111,7 @@ public class BasketServiceImpl implements BasketService {
                     throw new QuantityNotEnoughException("You try update more product than is in warehouse");
                 }
                 product.setName(productDb.getName());
-                product.setPrice(productDb.getPrice());
+                product.setPrice(productDb.getPrice().intValue());
                 basket.getProducts().add(product);
                 basketRepository.save(basket);
             }
@@ -110,6 +124,7 @@ public class BasketServiceImpl implements BasketService {
 
     @Override
     @RateLimiter(name="productService")
+    @Operation(description = "get information about AllProducts", security = @SecurityRequirement(name = "BearerToken"))
     public List<Product> getAllProducts() {
         return basketRepository.findByEmail(SecurityUtils.getCurrentUserEmail())
                 .map(Basket::getProducts)
